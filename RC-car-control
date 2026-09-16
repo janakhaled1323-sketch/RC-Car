@@ -1,0 +1,287 @@
+#include "BluetoothSerial.h"
+
+// Create Bluetooth Serial object
+BluetoothSerial SerialBT;
+
+// Motor speed pins (PWM)
+#define speedMottorA 13
+#define speedMottorB 12
+#define speedMottorC 14
+#define speedMottorD 27
+
+// First Right Motor pins
+#define IN1MottorA 26
+#define IN2MottorA 25
+
+// First Left Motor pins
+#define IN1MottorB 33
+#define IN2MottorB 32
+
+// Second Right Motor pins
+#define IN1MottorC 23
+#define IN2MottorC 22
+
+// Second Left Motor pins
+#define IN1MottorD 19
+#define IN2MottorD 18
+
+// Status LED pin
+#define led 2
+
+unsigned long lastPrint = 0;
+char command = 0;
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Bluetooth device name that will appear on the phone
+  SerialBT.begin("Cyber Beasts");
+
+  // Initialize motor speed pins as outputs
+  pinMode(speedMottorA, OUTPUT);
+  pinMode(speedMottorB, OUTPUT);
+  pinMode(speedMottorC, OUTPUT);
+  pinMode(speedMottorD, OUTPUT);
+
+  // Initialize first right motor direction pins
+  pinMode(IN1MottorA, OUTPUT);
+  pinMode(IN2MottorA, OUTPUT);
+
+  // Initialize first left motor direction pins
+  pinMode(IN1MottorB, OUTPUT);
+  pinMode(IN2MottorB, OUTPUT);
+
+  // Initialize second right motor direction pins
+  pinMode(IN1MottorC, OUTPUT);
+  pinMode(IN2MottorC, OUTPUT);
+
+  // Initialize second left motor direction pins
+  pinMode(IN1MottorD, OUTPUT);
+  pinMode(IN2MottorD, OUTPUT);
+
+  // Initialize LED pin
+  pinMode(led, OUTPUT);
+
+  // Stop all motors initially (Speed = 0)
+  analogWrite(speedMottorA, 0);
+  analogWrite(speedMottorB, 0);
+  analogWrite(speedMottorC, 0);
+  analogWrite(speedMottorD, 0);
+
+  // Turn off LED initially
+  digitalWrite(led, LOW);
+
+  Serial.println("Bluetooth Started");
+  Serial.println("Name: Syber Beasts");
+}
+
+void loop() {
+
+  // Read incoming commands from the mobile application via Bluetooth
+  while (SerialBT.available()) {
+    char x = SerialBT.read();
+
+    // Check for valid movement commands (Forward, Backward, Left, Right, Diagonals, and Stop)
+    if (x == 'F' || x == 'B' || x == 'L' || x == 'R' ||
+        x == 'G' || x == 'H' || x == 'I' || x == 'J' || x == 'S') {
+      command = x;
+    }
+  }
+
+  // Execute commands every 50ms to ensure smooth and stable movement
+  if (millis() - lastPrint >= 50) {
+    lastPrint = millis();
+
+    switch (command) {
+
+      // Move Forward
+      case 'F':
+        analogWrite(speedMottorA, 128);
+        digitalWrite(IN1MottorA, HIGH);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 128);
+        digitalWrite(IN1MottorB, HIGH);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 128);
+        digitalWrite(IN1MottorC, HIGH);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 128);
+        digitalWrite(IN1MottorD, HIGH);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, HIGH); // Turn on LED while moving
+        break;
+
+      // Move Backward
+      case 'B':
+        analogWrite(speedMottorA, 128);
+        digitalWrite(IN1MottorA, LOW);
+        digitalWrite(IN2MottorA, HIGH);
+
+        analogWrite(speedMottorB, 128);
+        digitalWrite(IN1MottorB, LOW);
+        digitalWrite(IN2MottorB, HIGH);
+
+        analogWrite(speedMottorC, 128);
+        digitalWrite(IN1MottorC, LOW);
+        digitalWrite(IN2MottorC, HIGH);
+
+        analogWrite(speedMottorD, 128);
+        digitalWrite(IN1MottorD, LOW);
+        digitalWrite(IN2MottorD, HIGH);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Turn / Move Left
+      case 'L':
+        analogWrite(speedMottorA, 128);
+        digitalWrite(IN1MottorA, HIGH);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 0);
+        digitalWrite(IN1MottorB, LOW);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 128);
+        digitalWrite(IN1MottorC, HIGH);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 0);
+        digitalWrite(IN1MottorD, LOW);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Turn / Move Right
+      case 'R':
+        analogWrite(speedMottorA, 0);
+        digitalWrite(IN1MottorA, LOW);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 128);
+        digitalWrite(IN1MottorB, HIGH);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 0);
+        digitalWrite(IN1MottorC, LOW);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 128);
+        digitalWrite(IN1MottorD, HIGH);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Forward-Right Diagonal Movement
+      case 'G':
+        analogWrite(speedMottorA, 128);
+        digitalWrite(IN1MottorA, HIGH);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 64);
+        digitalWrite(IN1MottorB, HIGH);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 128);
+        digitalWrite(IN1MottorC, HIGH);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 64);
+        digitalWrite(IN1MottorD, HIGH);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Backward-Right Diagonal Movement
+      case 'H':
+        analogWrite(speedMottorA, 128);
+        digitalWrite(IN1MottorA, LOW);
+        digitalWrite(IN2MottorA, HIGH);
+
+        analogWrite(speedMottorB, 64);
+        digitalWrite(IN1MottorB, LOW);
+        digitalWrite(IN2MottorB, HIGH);
+
+        analogWrite(speedMottorC, 128);
+        digitalWrite(IN1MottorC, LOW);
+        digitalWrite(IN2MottorC, HIGH);
+
+        analogWrite(speedMottorD, 64);
+        digitalWrite(IN1MottorD, LOW);
+        digitalWrite(IN2MottorD, HIGH);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Forward-Left Diagonal Movement
+      case 'I':
+        analogWrite(speedMottorA, 64);
+        digitalWrite(IN1MottorA, HIGH);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 128);
+        digitalWrite(IN1MottorB, HIGH);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 64);
+        digitalWrite(IN1MottorC, HIGH);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 128);
+        digitalWrite(IN1MottorD, HIGH);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Backward-Left Diagonal Movement
+      case 'J':
+        analogWrite(speedMottorA, 64);
+        digitalWrite(IN1MottorA, LOW);
+        digitalWrite(IN2MottorA, HIGH);
+
+        analogWrite(speedMottorB, 128);
+        digitalWrite(IN1MottorB, LOW);
+        digitalWrite(IN2MottorB, HIGH);
+
+        analogWrite(speedMottorC, 64);
+        digitalWrite(IN1MottorC, LOW);
+        digitalWrite(IN2MottorC, HIGH);
+
+        analogWrite(speedMottorD, 128);
+        digitalWrite(IN1MottorD, LOW);
+        digitalWrite(IN2MottorD, HIGH);
+
+        digitalWrite(led, HIGH);
+        break;
+
+      // Stop All Motors
+      case 'S':
+        analogWrite(speedMottorA, 0);
+        digitalWrite(IN1MottorA, LOW);
+        digitalWrite(IN2MottorA, LOW);
+
+        analogWrite(speedMottorB, 0);
+        digitalWrite(IN1MottorB, LOW);
+        digitalWrite(IN2MottorB, LOW);
+
+        analogWrite(speedMottorC, 0);
+        digitalWrite(IN1MottorC, LOW);
+        digitalWrite(IN2MottorC, LOW);
+
+        analogWrite(speedMottorD, 0);
+        digitalWrite(IN1MottorD, LOW);
+        digitalWrite(IN2MottorD, LOW);
+
+        digitalWrite(led, LOW); // Turn off LED when stopped
+        break;
+    }
+  }
+}
